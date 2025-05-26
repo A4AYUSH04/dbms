@@ -1,0 +1,230 @@
+{% extends 'navbar.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'stylesheets/search_colleges.css' %}">
+
+<style>
+    body {
+        background-color: black;
+        color: white;
+    }
+
+    .heading {
+        margin: 25px 0px;
+        text-align: center;
+    }
+
+    .table1 {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        width: 100vw;
+    }
+
+    .table1_row {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(217, 217, 217, 0.086);
+        color: white;
+        margin: 10px;
+        padding: 10px 0px;
+    }
+
+    .table1_data_heading {
+        background-color: white;
+        color: black;
+        font-weight: bold;
+    }
+
+    .table1_row > * {
+        padding: 0px 20px;
+    }
+
+    .table1_data1 { width: 10%; }
+    .table1_data2 { width: 30%; }
+    .table1_data3 { width: 15%; }
+    .table1_data4 { width: 15%; }
+    .table1_data5 { width: 15%; }
+    .table1_data6 { width: 15%; }
+
+    .search-form {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 20px;
+    }
+
+    .search-form input,
+    .search-form select,
+    .search-form button {
+        margin: 5px;
+    }
+    #download-btn:hover {
+    background-color: #ffc107;
+    color: black;
+    transform: scale(1.05);
+    transition: all 0.3s ease-in-out;
+}
+
+</style>
+{% if is_search %}
+
+<h1 class="heading">Search for a College</h1>
+
+<!-- ✅ SEARCH FORM -->
+<!-- <form method="POST" action="{% url 'search_colleges' %}" class="d-flex">
+    {% csrf_token %}
+    <input class="form-control me-2" name="search" type="search" placeholder="College Name" value="{{ item_searched }}">
+    <input class="form-control me-2" name="percentile_entered" type="text" placeholder="Enter Percentile" value="{{ percentile_entered_float }}">
+
+    <select name="branch" class="form-control me-2">
+        <option value="">Select Branch</option>
+        <option value="CSE" {% if selected_branch == 'CSE' %}selected{% endif %}>CSE</option>
+        <option value="IT" {% if selected_branch == 'IT' %}selected{% endif %}>IT</option>
+        <option value="EXTC" {% if selected_branch == 'EXTC' %}selected{% endif %}>EXTC</option>
+        <option value="MECH" {% if selected_branch == 'MECH' %}selected{% endif %}>MECH</option>
+        <option value="CIVIL" {% if selected_branch == 'CIVIL' %}selected{% endif %}>CIVIL</option>
+        <option value="AI&DS" {% if selected_branch == 'AI&DS' %}selected{% endif %}>AI&DS</option>
+    </select>
+
+    <select name="status_category" class="form-control me-2">
+        <option value="">Select Status Category</option>
+        {% for status in status_categories %}
+            <option value="{{ status }}" {% if selected_status == status %}selected{% endif %}>{{ status }}</option>
+        {% endfor %}
+    </select>
+
+    <button class="btn btn-outline-light" type="submit">Search</button>
+</form> -->
+
+
+
+<table class="table1">
+
+    <div class="table1_row table1_data_heading">
+        <div class="table1_data1">College code</div>
+        <div class="table1_data2">College name</div>
+        <div class="table1_data3">Branch code</div>
+        <div class="table1_data4">Branch name</div>
+        <div class="table1_data5">Status</div>
+        <div class="table1_data6">Percentile cutoff (Open)</div>
+    </div>
+
+    {% for college in colleges %}
+    <div class="table1_row">
+        <div class="table1_data1">{{ college.college_code }}</div>
+        <div class="table1_data2">{{ college.college_name }}</div>
+        <div class="table1_data3">{{ college.branch_code }}</div>
+        <div class="table1_data4">{{ college.branch_name }}</div>
+        <div class="table1_data5">{{ college.status_category }}</div>
+        <div class="table1_data6">{{ college.open_percentile }}</div>
+    </div>
+    {% empty %}
+    <p style="color: red; text-align: center;">No colleges found.</p>
+    {% endfor %}
+    {% endif %}
+</table>
+
+
+<h1 class="heading">
+    Collage With Applied Filters Searched
+</h1>
+
+<table class="table1">
+    <div class="table1_row table1_data_heading">
+        <div class="table1_data1">College code</div>
+        <div class="table1_data2">College name</div>
+        <div class="table1_data3">Branch code</div>
+        <div class="table1_data4">Branch name</div>
+        <div class="table1_data5">Status</div>
+        <div class="table1_data6">Percentile cutoff (Open)</div>
+    </div>
+
+    {% for college in colleges %}
+    {% if percentile_entered_float is None or college.open_percentile <= percentile_entered_float %}
+    <div class="table1_row">
+        <div class="table1_data1">{{ college.college_code }}</div>
+        <div class="table1_data2">{{ college.college_name }}</div>
+        <div class="table1_data3">{{ college.branch_code }}</div>
+        <div class="table1_data4">{{ college.branch_name }}</div>
+        <div class="table1_data5">{{ college.status_category }}</div>
+        <div class="table1_data6">{{ college.open_percentile }}</div>
+    </div>
+    {% endif %}
+    {% empty %}
+    <p style="color: red; text-align: center;">No colleges found for this search.</p>
+    {% endfor %}
+</table>
+
+<!-- ✅ Download Button -->
+<div style="text-align: center; margin-top: 30px;">
+    <button id="download-btn" class="btn btn-outline-warning btn-lg fw-bold shadow-lg" style="border-radius: 50px; padding: 10px 30px;">
+        ⬇️ Download Results as CSV
+    </button>
+</div>
+
+
+<!-- ✅ JavaScript for Download -->
+<script>
+document.getElementById("download-btn").addEventListener("click", function () {
+    const rows = [];
+    const tableRows = document.querySelectorAll(".table1_row:not(.table1_data_heading)");
+
+    tableRows.forEach(row => {
+        const cols = row.querySelectorAll("div");
+        if (cols.length === 6) {
+            rows.push({
+                college_code: cols[0].innerText.trim(),
+                college_name: cols[1].innerText.trim(),
+                branch_code: cols[2].innerText.trim(),
+                branch_name: cols[3].innerText.trim(),
+                status: cols[4].innerText.trim(),
+                percentile_cutoff: cols[5].innerText.trim()
+            });
+        }
+    });
+
+    fetch("/download_csv/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+        body: JSON.stringify({ results: rows })
+    })
+    .then(response => response.blob())
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "search_results.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + "=")) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+
+
+{% endblock content %}

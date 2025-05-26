@@ -1,0 +1,40 @@
+{% extends 'navbar.html' %}
+{% load static %}
+{% block content %}
+
+
+<link rel="stylesheet" href="{% static 'stylesheets/home.css' %}">
+
+<div class="overlay">
+
+    <h1 class="heading text-center">All Colleges</h1>
+
+    {% if user.is_authenticated %}
+        <p class="text-center">Welcome, {{ user.username }}!</p>
+    {% endif %}
+
+    <div class="table1">
+        <div class="table1_row table1_data_heading">
+            <div class="table1_data1">College code</div>
+            <div class="table1_data2">College name</div>
+            <div class="table1_data3">Branch code</div>
+            <div class="table1_data4">Branch name</div>
+            <div class="table1_data5">Status</div>
+            <div class="table1_data6">Percentile cutoff (Open)</div>
+        </div>
+
+        {% for college in colleges %}
+            <div class="table1_row">
+                <div class="table1_data1">{{ college.college_code }}</div>
+                <div class="table1_data2">{{ college.college_name }}</div>
+                <div class="table1_data3">{{ college.branch_code }}</div>
+                <div class="table1_data4">{{ college.branch_name }}</div>
+                <div class="table1_data5">{{ college.status_category }}</div>
+                <div class="table1_data6">{{ college.open_percentile }}</div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock content %}
